@@ -47,7 +47,7 @@
       <td>
         <a href="#"><i class="glyphicon glyphicon-print"></i></a>
         <a href="#"><i class="glyphicon glyphicon-edit"></i></a>
-        <a href="{% url 'delete-image' dog.pk %}" onclick="confirmDelete(event)"><i class="glyphicon glyphicon-trash"></i></a>
+        <a href="{% url 'app:delete-image' dog.pk %}" onclick="confirmDelete(event)"><i class="glyphicon glyphicon-trash"></i></a>
       </td>
     </tr>
     {% endfor %}
