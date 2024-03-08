@@ -129,7 +129,8 @@ def test(request):
 def approve(request):
     dogs = Dog.objects.all()
     bills = Bill.objects.all()
-    context = {'dogs': dogs, 'bills': bills}
+    approved_data = AcceptedItem.objects.all()
+    context = {'dogs': dogs, 'bills': bills,'approved_data': approved_data}
     return render(request, 'approve.html', context)
 
 def accept(request):
@@ -168,3 +169,4 @@ def save_accepted_item(request):
         return JsonResponse({'message': 'Accepted item saved successfully'}, status=200)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+

@@ -87,6 +87,17 @@
     </thead>
     <tbody>
         <!-- Accepted items will be added here dynamically -->
+        {% for dog in approved_data  %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+                <img src="{{ dog.dog_view_url }}" alt="{{ dog.dog_view_url }}" width="75px">
+            </td>
+            <td>
+                <img src="{{ dog.bill_view_url }}" alt="{{ dog.bill_view_url }}" width="75px">
+            </td>
+        </tr>
+        {% endfor %}
     </tbody>
 </table>
 
