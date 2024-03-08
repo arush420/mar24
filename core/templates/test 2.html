@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparison View</title>
+<style>
+    /* Styles for the comparison table */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    /* Styles for the buttons */
+    .approve-btn {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+</style>
+</head>
+<body>
+
+<h2>Comparison View</h2>
+
+<h3>Pending Items</h3>
+<table id="pending-table">
+    <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Dog View</th>
+            <th>Bill View</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dog in dogs %}
+        <tr>
+            <td>Feature 1</td>
+            <td draggable="true" class="image-cell" onclick="enlargeImage('{{ dog.image.url }}')">
+                <img src="{{ dog.image.url }}" alt="{{ dog.name }}" width="75px">
+            </td>
+            <td draggable="true" class="image-cell" onclick="enlargeImage('{{ dog.image.url }}')">
+                <img src="{{ dog.image.url }}" alt="{{ dog.name }}" width="75px">
+            </td>
+            <td><button class="approve-btn">Approve</button></td>
+        </tr>
+        {% endfor %}
+        {% for bill in bills %}
+        <tr>
+            <td>Feature 2</td>
+            <td draggable="true">
+                <img src="{{ bill.image.url }}" alt="{{ bill.name }}" width="75px">
+            </td>
+            <td draggable="true">{{ bill.name }}</td>
+            <td><button class="approve-btn">Approve</button></td>
+        </tr>
+        {% endfor %}
+        <!-- Add more rows as needed -->
+    </tbody>
+</table>
+
+<h3>Accepted Items</h3>
+<table id="approved-table">
+    <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Dog View</th>
+            <th>Bill View</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Accepted items will be added here dynamically -->
+    </tbody>
+</table>
+
+<!-- Card overlay -->
+<div class="overlay" id="overlay" onclick="hideOverlay()">
+  <img id="overlay-img" src="" alt="">
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pendingTable = document.getElementById('pending-table').querySelector('tbody');
+        const approvedTable = document.getElementById('approved-table').querySelector('tbody');
+
+        function moveToApproved(row) {
+            // Clone the row
+            const newRow = row.cloneNode(true);
+
+            // Remove the row from pending table
+            row.parentNode.removeChild(row);
+
+            // Modify the content of the cloned row
+            const dogImage = newRow.querySelector('.dog-image');
+            const dogName = newRow.querySelector('.dog-name');
+            const billImage = newRow.querySelector('.bill-image');
+            const billName = newRow.querySelector('.bill-name');
+
+            if (dogImage) {
+                dogImage.src = dogImage.dataset.url; // Update image src
+                dogName.textContent = dogImage.alt; // Update dog name
+            }
+            if (billImage) {
+                billImage.src = billImage.dataset.url; // Update image src
+                billName.textContent = billImage.alt; // Update bill name
+            }
+
+            // Add the modified row to approved table
+            approvedTable.appendChild(newRow);
+        }
+
+        function handleApproveClick() {
+            const row = this.parentNode.parentNode;
+            moveToApproved(row);
+        }
+
+        const approveBtns = document.querySelectorAll('.approve-btn');
+        approveBtns.forEach(function(btn) {
+            btn.addEventListener('click', handleApproveClick);
+        });
+
+    });
+</script>
+
+
+</body>
+{% endblock %}

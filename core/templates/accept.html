@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparison View</title>
+<style>
+    /* Styles for the comparison table */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    /* Styles for the buttons */
+    .approve-btn {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+</style>
+</head>
+<body>
+
+<h2>Comparison View</h2>
+
+<h3>Pending Items</h3>
+<table id="pending-table">
+    <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Dog View</th>
+            <th>Bill View</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Rows for pending items will be added dynamically -->
+    </tbody>
+</table>
+
+<h3>Approved Items</h3>
+<table id="approved-table">
+    <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Dog View</th>
+            <th>Bill View</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Rows for approved items will be added dynamically -->
+        {% for item in accepted_items %}
+        <tr>
+            <td>{{ item.feature }}</td>
+            <td><img src="{{ item.dog_view_url }}" alt="Dog View" width="75px"></td>
+            <td><img src="{{ item.bill_view_url }}" alt="Bill View" width="75px"></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pendingTable = document.getElementById('pending-table').querySelector('tbody');
+        const approvedTable = document.getElementById('approved-table').querySelector('tbody');
+
+        function moveToApproved(row) {
+            const feature = row.cells[0].textContent;
+            const dogView = row.cells[1].textContent;
+            const billView = row.cells[2].textContent;
+
+            // Remove the row from pending table
+            row.parentNode.removeChild(row);
+
+            // Add the row to approved table
+            const newRow = approvedTable.insertRow();
+            newRow.insertCell(0).textContent = feature;
+            newRow.insertCell(1).textContent = dogView;
+            newRow.insertCell(2).textContent = billView;
+        }
+
+        function handleApproveClick() {
+            const row = this.parentNode.parentNode;
+            moveToApproved(row);
+        }
+
+        const pendingRows = document.querySelectorAll('#pending-table tbody tr');
+        pendingRows.forEach(function(row) {
+            const approveBtn = row.querySelector('.approve-btn');
+            approveBtn.addEventListener('click', handleApproveClick);
+        });
+
+    });
+</script>
+
+</body>
+{% endblock %}

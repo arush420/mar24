@@ -1,0 +1,31 @@
+<!-- templates/approval_list.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approval List</title>
+</head>
+<body>
+    <h1>Approved Entries</h1>
+    <ul>
+        {% for entry in approved_entries %}
+            <li>{{ entry.field1 }} - {{ entry.field2 }}</li>
+            <!-- Add other fields as needed -->
+        {% empty %}
+            <li>No approved entries found.</li>
+        {% endfor %}
+    </ul>
+
+    <h1>Pending Entries</h1>
+    <ul>
+        {% for entry in pending_entries %}
+            <li>{{ entry.field1 }} - {{ entry.field2 }}</li>
+            <!-- Add other fields as needed -->
+        {% empty %}
+            <li>No pending entries found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

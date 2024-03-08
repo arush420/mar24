@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Webcam</title>
+</head>
+<body>
+<h3>Bill Upload Portal</h3>
+    <a href="list_bill">List of all Bill uploads!</a>
+
+<!-- Stream video via webcam -->
+<div class="video-wrap">
+    <video id="video" playsinline autoplay></video>
+</div>
+
+<!-- Trigger canvas web API -->
+<div class="controller">
+    <button id="snap">Capture</button>
+    <button id="approve" style="display: none;">Approve</button>
+    <button id="reject" style="display: none;">Reject</button>
+</div>
+
+<!-- Webcam video snapshot -->
+<canvas id="canvas" width="640" height="480"></canvas>
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+
+<script>
+'use strict';
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const snap = document.getElementById('snap');
+const approve = document.getElementById('approve');
+const reject = document.getElementById('reject');
+const errorMsgElement = document.getElementById('span#ErrorMsg');
+
+const constraints = {
+    audio: false,
+    video: {
+        width: 1280, height: 720
+    }
+};
+
+let imageData; // Variable to store the captured image data
+
+// Access webcam
+async function init(){
+    try{
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        handleSuccess(stream);
+    }
+    catch(e){
+        errorMsgElement.innerHTML = `navigator.getUserMedia.error: ${e.toString()}`;
+    }
+}
+
+// Success
+function handleSuccess(stream){
+    window.stream = stream;
+    video.srcObject = stream;
+}
+
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+// Capture image
+var context = canvas.getContext('2d');
+snap.addEventListener("click", function(){
+    context.drawImage(video, 0, 0, 640, 480);
+    imageData = canvas.toDataURL(); // Store image data as Base64 string
+
+    // Show approve and reject buttons
+    approve.style.display = 'inline';
+    reject.style.display = 'inline';
+});
+
+// Approve image
+approve.addEventListener("click", function(){
+    if (imageData) {
+        // Send imageData to Django backend for storage
+        fetch('/save-image-bill/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrftoken // Include the CSRF token in the headers
+            },
+            body: 'image_data=' + encodeURIComponent(imageData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message); // Log the response message
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
+        // Clear imageData after approval
+        imageData = null;
+        // Hide approve and reject buttons
+        approve.style.display = 'none';
+        reject.style.display = 'none';
+    } else {
+        console.log("No image data available to approve.");
+    }
+});
+
+// Reject image
+reject.addEventListener("click", function(){
+    // Clear the canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    // Clear imageData
+    imageData = null;
+    // Hide approve and reject buttons
+    approve.style.display = 'none';
+    reject.style.display = 'none';
+});
+
+// Load init
+init();
+
+</script>
+
+<h3>Bill Upload Portal</h3>
+    <a href="list_bill">List of all Bill uploads!</a>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+</body>
+{% endblock %}

@@ -1,0 +1,74 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    height: 50px;
+    font-size: 25px;
+    font-family: monospace;
+    text-align: center;
+    background-color: green;
+    color: white;
+}
+
+td {
+    height: 50px;
+    text-align: center;
+}
+
+th, td {
+    padding: 15px;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+a {
+    margin-right: 55px;
+}
+
+.glyphicon {
+    font-size: 25px;
+}
+
+.glyphicon-print {
+    color: green;
+}
+
+.glyphicon-edit {
+    color: blue;
+}
+
+.glyphicon-trash {
+    color: red;
+}
+
+.glyphicon-print:hover {
+    box-shadow: 0 0 5px 4px green;
+    transition: 0.6s;
+    border-radius: 4px;
+}
+
+.glyphicon-edit:hover {
+    box-shadow: 0 0 5px 4px blue;
+    transition: 0.6s;
+    border-radius: 4px;
+}
+
+.glyphicon-trash:hover {
+    box-shadow: 0 0 5px 4px red;
+    transition: 0.6s;
+    border-radius: 4px;
+}
+
+#myInput {
+    width: 200px;
+    height: 50px;
+    font-size: 20px;
+    padding: 8px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: 2px solid darkorange;
+}

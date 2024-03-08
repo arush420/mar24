@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparison View</title>
+<style>
+    /* Styles for the comparison table */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    /* Styles for the buttons */
+    .approve-btn {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+</style>
+</head>
+<body>
+
+<h2>Comparison View</h2>
+
+<h3>Pending Items</h3>
+<table id="pending-table">
+    <thead>
+        <tr>
+            <th>Serial No.</th>
+            <th>Dog View</th>
+            <th>Bill View</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dog in dogs %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+                <img src="{{ dog.image.url }}" alt="{{ dog.name }}" width="75px">
+            </td>
+            <td>
+                <img src="{{ dog.image.url }}" alt="{{ dog.name }}" width="75px">
+            </td>
+            <td><button class="approve-btn">Approve</button></td>
+        </tr>
+        {% endfor %}
+        {% for bill in bills %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+                <img src="{{ bill.image.url }}" alt="{{ bill.name }}" width="75px">
+            </td>
+            <td>{{ bill.bill_view }}</td> <!-- Assuming bill_view is the attribute holding the URL for bill view -->
+            <td><button class="approve-btn">Approve</button></td>
+        </tr>
+        {% endfor %}
+        <!-- Add more rows as needed -->
+    </tbody>
+</table>
+
+<h3>Accepted Items</h3>
+<table id="approved-table">
+    <thead>
+        <tr>
+            <th>Serial No.</th>
+            <th>Dog View</th>
+            <th>Bill View</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Accepted items will be added here dynamically -->
+    </tbody>
+</table>
+
+<!-- Card overlay -->
+<div class="overlay" id="overlay" onclick="hideOverlay()">
+  <img id="overlay-img" src="" alt="">
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pendingTable = document.getElementById('pending-table').querySelector('tbody');
+        const approvedTable = document.getElementById('approved-table').querySelector('tbody');
+
+        function moveToApproved(row) {
+            const feature = row.cells[0].textContent;
+            const dogViewUrl = row.cells[1].querySelector('img').src;
+            const billViewUrl = row.cells[2].textContent; // Assuming the URL is directly in the cell
+
+            // Move the row from pending table to approved table
+            approvedTable.appendChild(row);
+
+            // Update feature text
+            row.cells[0].textContent = feature;
+
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Send AJAX request to save the accepted item
+            fetch('/save-accepted-item/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken  // Include CSRF token here
+                },
+                body: JSON.stringify({
+                    feature: feature,
+                    dog_view_url: dogViewUrl,
+                    bill_view_url: billViewUrl
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to save accepted item');
+                }
+                // Handle success
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Event delegation for approve button clicks
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('approve-btn')) {
+                const row = event.target.closest('tr');
+                moveToApproved(row);
+            }
+        });
+
+    });
+</script>
+
+</body>
+{% endblock %}
